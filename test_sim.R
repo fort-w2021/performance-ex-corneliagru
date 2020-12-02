@@ -35,6 +35,11 @@ parallel <- function() {
 
 
 
+testfun <- function() {
+  sqrt(x)
+}
+
+
 
 bench::mark(slow = slow(), 
             better = better(),
