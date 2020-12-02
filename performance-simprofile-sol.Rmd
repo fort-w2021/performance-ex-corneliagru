@@ -1,0 +1,50 @@
+## Mopsgeschwindigkeit
+
+Der Code in `slow-sim.R` implementiert eine (relativ sinnbefreite) Simulationsstudie um die Verteilung der geschätzten Regressionskoeffizienten $\hat\beta$ in einem Modell 
+$y \sim t(\text{ncp}= X \beta, \text{df}=4)$ mit $t(4)$-verteilten Fehlern und
+linearem Prädiktor $X \beta$ zu bestimmen:
+```{r, slow_sim}
+source("slow-sim.R")
+
+set.seed <- 232323
+observations <- 5000
+covariates <- 10
+testdata <- as.data.frame(
+  matrix(rnorm(observations * covariates),
+         nrow = observations
+  ))
+
+test <- simulate(reps = 100, seed = 20141028, data = testdata)
+
+system.time(test <- simulate(reps = 100, seed = 20141028, data = testdata))
+```
+Die Simulation ist recht ineffizient programmiert.
+
+a) Benutzen Sie die in der Vorlesung kennengelernten Profiling-Methoden um die Stellen zu identifizieren an denen das Skript in `slow-sim.R` die meiste Zeit verbringt. 
+
+**Antwort:**
+
+Zeile 6: cbind von den alten coefs und dem neu simulierten coef (1980)
+
+Zeile 12: simulate response (720) es wird unnötigerweise jedesmal aufs neue expected berechnet
+Zeile 13: esimate_coef(data) (1260)
+
+Zeile 26: model estimation
+
+
+
+b) Modifizieren Sie den Code in `slow-sim.R` so, dass er i) **mindestens 5x schneller** läuft (ohne dass sich die Ergebnisse qualitativ ändern!!) und ii) unseren Vorstellungen von sauber dokumentierter, gut strukturierter und defensiv programmierter Software entspricht.
+
+**Antwort:** Siehe `slow-sim-sol.R`.
+
+Ich habe es nicht geschafft `slow-sim-parallel-sol.R` zum laufen zu bringen: 
+
+'Fehler in { : task 1 failed - "could not find function "simulate_once""'
+
+Scheiß Windows....
+
+**Antwort 2:** man könnte nachdem man eh nur nonsense macht einen random fehler auf die true_coefs addieren und zum gleichen Ergebnis kommen, und zwar einer Matrix die ungefähr die wahren Werte enthält.
+
+
+**Frage:**
+Was halten wir von dtplyr https://github.com/tidyverse/dtplyr ?
