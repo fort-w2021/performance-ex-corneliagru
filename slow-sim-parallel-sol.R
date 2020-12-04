@@ -1,7 +1,7 @@
 library(foreach)
 
 
-#Frage: wo kommt dieser Code schnipsel hin? 
+#Frage: wo kommt dieser Code schnipsel hin?
 library(doParallel)
 #library(parallel)
 
@@ -11,13 +11,13 @@ registerDoParallel(cluster)
 
 # function to simulate reps different datasets and estimate the coefficeints of
 # a linear model of y = data* true_coef + error, where the error is t(df)
-# distributed 
+# distributed
 
 # inputs : reps: num of repitions, seed: seed for drawing random numbers, data:
 # data where the random error will be added, true_coef: vector of true
 # coefficients, df: degrees of freedom for t distributet error
 
-# output: 
+# output:
 
 
 # function to simulate reps different datasets and estimate the coefficeints of
@@ -35,9 +35,9 @@ simulate <- function(reps, seed, data, true_coef = 0:ncol(data), df = 4) {
   assert_data_frame(data)
   assert_numeric(true_coef, len = ncol(data) + 1)
   assert_count(df)
-  
-  
-  
+
+
+
   set.seed(seed)
   expected <- calculate_expected(data, true_coef)
 
@@ -51,12 +51,14 @@ simulate <- function(reps, seed, data, true_coef = 0:ncol(data), df = 4) {
 simulate <- function(reps, seed, data, true_coef = 0:ncol(data), df = 4) {
   set.seed(seed)
   expected <- calculate_expected(data, true_coef)
-  
-  coefs <- foreach(rep = seq_len(reps), .combine = 'cbind') %dopar% {
+
+  coefs <- foreach(rep = seq_len(reps), .combine = 'cbind',
+                   .export = c("simulate_once", "simulate_response", "estimate_coef",
+                               "expected", "df", "data")) %dopar% {
     simulate_once(expected, df, data)
   }
-  
-  
+
+
   return(structure(coefs, seed = seed))
 }
 
